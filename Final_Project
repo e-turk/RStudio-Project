@@ -1,0 +1,257 @@
+TITLE by EMRE_TURK
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using
+# in your analysis in this code chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk.
+# This prevents the code from displaying in the knitted HTML output.
+# You should set echo=FALSE for all code chunks in your file.
+# I donwloaded most of data from TUIK link:http://www.tuik.gov.tr
+install.packages("ggplot2", dependencies = T) 
+install.packages("knitr", dependencies = T)
+install.packages("dplyr", dependencies = T)
+install.packages("tidyverse")
+
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+getwd()
+edci <- read.csv("egitim_durumu_illerc.csv")
+edci
+edci9 <- subset(edci, yillar==2009)
+edci10 <- subset(edci, yillar==2010)
+edci11 <- subset(edci, yillar==2011)
+edci12 <- subset(edci, yillar==2012)
+edci13 <- subset(edci, yillar==2013)
+edci14 <- subset(edci, yillar==2014)
+edci15 <- subset(edci, yillar==2015)
+edci16 <- subset(edci, yillar==2016)
+
+edcb <- read.csv("egitim_durumu_bolgelerc.csv")
+edcb
+edcb9 <- subset(edcb, yillar==2009)
+edcb10 <- subset(edcb, yillar==2010)
+edcb11 <- subset(edcb, yillar==2011)
+edcb12 <- subset(edcb, yillar==2012)
+edcb13 <- subset(edcb, yillar==2013)
+edcb14 <- subset(edcb, yillar==2014)
+edcb15 <- subset(edcb, yillar==2015)
+edcb16 <- subset(edcb, yillar==2016)
+
+gdp <- readxl::read_xlsx("gdp.xlsx")
+gdp
+gdp4 <- subset(gdp, yillar==2004)
+gdp5 <- subset(gdp, yillar==2005)
+gdp6 <- subset(gdp, yillar==2006)
+gdp7 <- subset(gdp, yillar==2007)
+gdp8 <- subset(gdp, yillar==2008)
+gdp9 <- subset(gdp, yillar==2009)
+gdp10 <- subset(gdp, yillar==2010)
+gdp11 <- subset(gdp, yillar==2011)
+gdp12 <- subset(gdp, yillar==2012)
+gdp13 <- subset(gdp, yillar==2013)
+gdp14 <- subset(gdp, yillar==2014)
+
+mtl <- read.csv("mutluluk.csv")
+
+okm <- read.csv("okuma_yazma.csv")
+```
+
+# Univariate Plots Section
+```{r echo=FALSE, Univariate_Plots}
+qplot(x=yillar, y=okuma_yazma_bilen, data=okm)
+qplot(x=yillar, y=okuma_yazma_bilen/nufus_toplam, data=okm)
+
+qplot(x=yillar, y=okuma_yazma_bilmeyen, data=okm)
+qplot(x=yillar, y=okuma_yazma_bilmeyen/nufus_toplam, data=okm)
+
+qplot(x=yillar, y=okuma_yazma_bilen_kadin, data=okm)
+qplot(x=yillar, y=okuma_yazma_bilen_kadin/nufus_toplam, data=okm)
+
+qplot(x=yillar, y=okuma_yazma_bilen_erkek, data=okm)
+qplot(x=yillar, y=okuma_yazma_bilen_erkek/nufus_toplam, data=okm)
+
+
+qplot(okuma_yazma_bilen, data = subset(edci,!is.na(cinsiyet)), geom = 'freqpoly', color=cinsiyet)+scale_x_continuous(lim=c(0,2000000), breaks = seq(0,2000000,250000))
+
+qplot(okuma_yazma_bilmeyen, data = subset(edci,!is.na(cinsiyet)), geom = 'freqpoly', color=cinsiyet)+scale_x_continuous(lim=c(0,150000), breaks = seq(0,150000,25000))
+
+
+qplot(x=ilk_okul, data = edci)+scale_x_continuous(lim=c(0,300000), breaks = seq(0,300000,50000))
+
+qplot(x=lise, data = edci)+scale_x_continuous(lim = c(0,300000), breaks = seq(0,300000,50000))
+
+qplot(x=universite, data = edci)+scale_x_continuous(lim = c(0,100000),breaks = seq(0,100000,15000))
+
+qplot(x=master, data = edci)+scale_x_continuous(lim = c(0,10000),breaks = seq(0,10000,1000))
+
+qplot(x=doktora, data = edci)+scale_x_continuous(lim = c(0,3000),breaks = seq(0,3000,1000))
+
+
+```
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+# There are 1296 observation in the dataset of edci with 23 variables. The variable iller, yillar, cinsiyet, are ordered factor vaiables with folowing levels.
+# Yillar: 2009, 2010,2011, 2012, 2013, 2014, 2015,2016.
+# �ller: Adana, Adiyaman, Afyan, Aksaray, Amasya, Ankara, Antalya...
+# Cinsiyet:Kadin, Erkek.
+```{r echo=FALSE, Structure of Data}
+names(edci)
+str(edci)
+dim(edci)
+head(edci)
+mean(edci$okuma_yazma_bilen)
+summary(edci)
+
+```
+
+### What is/are the main feature(s) of interest in your dataset?
+#T he main features in the data set are education expenditures, literacy,educational status and GDP. I'd like to find out the relationship between education expenditures and GDP. The aim is to prove that education expenditures are long term investment for a particaular district in Turkey which means the more you make educational expenses, the more you get regional development in turn.
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+# Yillar is another feature we need to observe that time contributed to education level in increasing way, the awareness of people about education importance are getting high level with folllowing years.
+# Educational level of gender, literacy of gender and educational expenses likely contribute to the development of district(iller).
+
+### Did you create any new variables from existing variables in the dataset?
+# I created new variables from existing variable of Education levels of regions and districts which is division of data year wise such as education elvels of 2016, gdp of 2014.
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+
+
+
+# Bivariate Plots Section
+```{r echo=FALSE, Bivariate_Plots}
+
+ggplot(aes(x=iller, y=okuma_yazma_bilen), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=okuma_yazma_bilmeyen), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=okuma_yazma_bilen), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=yillar, y=okuma_yazma_bilmeyen), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=okuma_yazma_bilen/nufus), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=okuma_yazma_bilmeyen/nufus), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=ilk_okul), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=ilk_okul), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=lise), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=lise), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=universite), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=universite), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=master), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=master), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=yillar, y=doktora), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+ggplot(aes(x=iller, y=doktora), data =edci)+geom_point()+theme(axis.text.x = element_text(angle=90))+geom_line(aes(color=cinsiyet))
+
+ggplot(aes(x=bolgeler, y=okuma_yazma_bilen), data = edcb)+geom_boxplot()+theme(axis.text.x = element_text(angle=90))
+ggplot(aes(x=bolgeler, y=ilk_okul), data = edcb)+geom_boxplot()+theme(axis.text.x = element_text(angle=90))
+ggplot(aes(x=bolgeler, y=lise), data = edcb)+geom_boxplot()+theme(axis.text.x = element_text(angle=90))
+ggplot(aes(x=bolgeler, y=universite), data = edcb)+geom_boxplot()+theme(axis.text.x = element_text(angle=90))
+ggplot(aes(x=bolgeler, y=master), data = edcb)+geom_boxplot()+theme(axis.text.x = element_text(angle=90))
+ggplot(aes(x=bolgeler, y=doktora), data = edcb)+geom_boxplot()+theme(axis.text.x = element_text(angle=90))
+
+qplot(x=iller, y=gdp, data = gdp)+theme(axis.text.x=element_text(angle=90))+geom_col(aes(color=yillar))
+
+ggplot(aes(x=iller, y=mutluluk_orani),data=subset(mtl,!is.na(mutluluk_orani)))+geom_point(aes(color=mutluluk_durumu), size=2)+theme(axis.text.x=element_text(angle=90))+scale_color_manual(values=c("#00ff00", "#ffff00", "#7fffd4","#ff0000","#56B4E9"),breaks=c("cok_mutlu","mutlu","orta","mutsuz","cok_mutsuz"),labels=c("cok_mutlu","mutlu","orta","mutsuz","cok_mutsuz"))
+
+ggplot(aes(x=iller, y=mutluluk_orani),data=subset(mtl,(mutluluk_durumu=="mutlu")))+geom_point(aes(color=mutluluk_durumu=="mutlu"), size=2)+theme(axis.text.x=element_text(angle=90))
+
+ggplot(aes(x=iller, y=mutluluk_orani),data=subset(mtl,(mutluluk_durumu=="mutsuz")))+geom_point(aes(color=mutluluk_durumu=="mutsuz"), size=2)+theme(axis.text.x=element_text(angle=90))
+
+```
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+# I observed that happines rate are generally high in the districts depends on growth domestic product and education level
+
+### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+
+### What was the strongest relationship you found?
+
+
+
+
+# Multivariate Plots Section
+
+```{r echo=FALSE, Multivariate_Plots}
+
+ggplot(aes(x=bolgeler, y=okuma_yazma_bilen),data=subset(edcb,!is.na(yillar)))+
+  geom_line(aes(color=yillar), size=7)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=iller, y=okuma_yazma_bilen),data=subset(edci,!is.na(iller)))+
+  geom_line(aes(color=iller), size=7)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=bolgeler, y=okuma_yazma_bilen),data=subset(edcb,!is.na(cinsiyet)))+
+  geom_line(aes(color=cinsiyet), size=7)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=bolgeler, y=okuma_yazma_bilmeyen),data=subset(edcb,!is.na(cinsiyet)))+
+  geom_line(aes(color=cinsiyet), size=7)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=iller, y=okuma_yazma_bilen),data=subset(edci,!is.na(cinsiyet)))+
+  geom_line(aes(color=cinsiyet), size=4)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=iller, y=okuma_yazma_bilmeyen),data=subset(edci,!is.na(cinsiyet)))+
+  geom_line(aes(color=cinsiyet), size=4)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=iller, y=okuma_yazma_bilen), data=subset(edci,!is.na(yillar)))+geom_line(aes(color=yillar), size=3)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=iller, y=nufus/okuma_yazma_bilen), data=subset(edci,!is.na(yillar)))+geom_line(aes(color=yillar), size=3)+theme(axis.text.x = element_text(angle=90))
+
+ggplot(aes(x=iller, y=mutluluk_orani),data=subset(mtl,(mutluluk_durumu=="mutlu")))+geom_point(aes(color=mutluluk_durumu=="mutlu"), size=2)+theme(axis.text.x=element_text(angle=90))+geom_line(stat = 'summary',mutluluk_orani.y=quantile)
+
+ggplot(aes(x=iller, y=mutluluk_orani),data=subset(mtl,(mutluluk_durumu=="mutsuz")))+geom_point(aes(color=mutluluk_durumu=="mutsuz"), size=2)+theme(axis.text.x=element_text(angle=90))
+
+```
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+#I observed that 
+
+### Were there any interesting or surprising interactions between features?
+# I found some suprising interation that literacy rate of male is always more that fmale and antoher thing that when literacy rate between males and females almost equal to each other which is showing us hapines rate also high at particular district
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+
+```
+
+### Description One
+
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+```
+
+### Description Two
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+
+```
+
+### Description Three
+
+------
+
+# Reflection
